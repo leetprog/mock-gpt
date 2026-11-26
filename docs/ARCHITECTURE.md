@@ -14,6 +14,10 @@
 
 ## Status
 
-The two entry points (default side-effect install, named factory export) and the build/type/lint tooling are in place. The core mock behavior — slots, `pubads()`, events, config, size mapping, creative rendering — isn't designed or implemented yet; `create-runtime.ts` is currently a placeholder returning just a working command queue. Each of those pieces should get the same treatment as the decisions in `docs/adr/` before being built — trade-offs considered and recorded where they're real, not formalized where they aren't.
+The v1 display-ad path is implemented and tested: both entry points, `Slot` and `PubAdsService` (full real method surface per ADR-0004, including the legacy setters as inert no-ops per that ADR's scope decision), the event lifecycle (ADR-0005/0006), size mapping + viewport override (ADR-0007), the default creative resolver (ADR-0001) and viewability resolver (ADR-0009), friendly-iframe rendering, the event log, and `googletag.mock.reset()`. `src/create-runtime.test.ts` covers the golden path, the no-compatible-sizes-vs-no-fill distinction, `collapseEmptyDivs`/`enableSingleRequest` enable-order gating, a custom creative resolver override, and reset.
 
-CI is intentionally not set up yet — there's no real test suite for it to run against. Add it once core implementation exists.
+Our own runtime types in `src/types/googletag.ts` are hand-written, not merged with the ambient `@types/google-publisher-tag` namespace — see **ADR-0010** for why. The isolated compat-check program that actually verifies those types against the official ones is still outstanding follow-up work, not yet built.
+
+Out of v1 scope by design (per `GLOSSARY.md`): companion ads, content service, video ads, real SafeFrame sandboxing. `defineOutOfPageSlot` is minimal — it doesn't yet support the `OutOfPageFormat` enum (rewarded/interstitial), which are also out of v1 scope.
+
+CI is intentionally not set up yet. Add it now that there's a real test suite for it to run.
